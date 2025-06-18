@@ -14,27 +14,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateRatioDisplay(type) {
     if (type === 'numerical') {
-        const numericalEl = document.getElementById('numericalRatio');
-        const theoreticalEl = document.getElementById('theoreticalRatio');
-        if (!numericalEl || !theoreticalEl) return;
-        
-        let value = parseInt(numericalEl.value) || 0;
+        let value = parseInt(document.getElementById('numericalRatio').value) || 0;
         // Ensure value is between 0 and 100
         if (value > 100) value = 100;
         if (value < 0) value = 0;
-        numericalEl.value = value;
-        theoreticalEl.value = 100 - value;
+        document.getElementById('numericalRatio').value = value;
+        document.getElementById('theoreticalRatio').value = 100 - value;
     } else if (type === 'ai') {
-        const cbseEl = document.getElementById('cbseRatio');
-        const aiEl = document.getElementById('aiRatio');
-        if (!cbseEl || !aiEl) return;
-        
-        let value = parseInt(cbseEl.value) || 0;
+        let value = parseInt(document.getElementById('cbseRatio').value) || 0;
         // Ensure value is between 0 and 100
         if (value > 100) value = 100;
         if (value < 0) value = 0;
-        cbseEl.value = value;
-        aiEl.value = 100 - value;
+        document.getElementById('cbseRatio').value = value;
+        document.getElementById('aiRatio').value = 100 - value;
     }
 }
 
@@ -176,30 +168,15 @@ function updateSelectedChapters() {
 }
 
 function calculateTotalMarks() {
-    // Add null checks to prevent errors
-    const mcqCountEl = document.getElementById('mcqCount');
-    const mcqMarksEl = document.getElementById('mcqMarks');
-    const shortCountEl = document.getElementById('shortCount');
-    const shortMarksEl = document.getElementById('shortMarks');
-    const longCountEl = document.getElementById('longCount');
-    const longMarksEl = document.getElementById('longMarks');
-    const totalMarksEl = document.getElementById('calculatedTotalMarks');
-    
-    // Check if all elements exist
-    if (!mcqCountEl || !mcqMarksEl || !shortCountEl || !shortMarksEl || !longCountEl || !longMarksEl || !totalMarksEl) {
-        console.warn('Some form elements not found, skipping total marks calculation');
-        return;
-    }
-    
-    const mcqCount = parseInt(mcqCountEl.value) || 0;
-    const mcqMarks = parseInt(mcqMarksEl.value) || 0;
-    const shortCount = parseInt(shortCountEl.value) || 0;
-    const shortMarks = parseInt(shortMarksEl.value) || 0;
-    const longCount = parseInt(longCountEl.value) || 0;
-    const longMarks = parseInt(longMarksEl.value) || 0;
+    const mcqCount = parseInt(document.getElementById('mcqCount').value) || 0;
+    const mcqMarks = parseInt(document.getElementById('mcqMarks').value) || 0;
+    const shortCount = parseInt(document.getElementById('shortCount').value) || 0;
+    const shortMarks = parseInt(document.getElementById('shortMarks').value) || 0;
+    const longCount = parseInt(document.getElementById('longCount').value) || 0;
+    const longMarks = parseInt(document.getElementById('longMarks').value) || 0;
     
     const totalMarks = (mcqCount * mcqMarks) + (shortCount * shortMarks) + (longCount * longMarks);
-    totalMarksEl.textContent = totalMarks;
+    document.getElementById('calculatedTotalMarks').textContent = totalMarks;
 }
 
 function shuffleArray(array) {
@@ -213,15 +190,9 @@ function shuffleArray(array) {
 
 function generateQuestions(type, count, chapters) {
     const questions = [];
-    
-    // Add null checks for form elements
-    const difficultyEl = document.getElementById('difficulty');
-    const numericalRatioEl = document.getElementById('numericalRatio');
-    const cbseRatioEl = document.getElementById('cbseRatio');
-    
-    const difficulty = difficultyEl ? difficultyEl.value : 'medium';
-    const numericalRatio = numericalRatioEl ? (parseInt(numericalRatioEl.value) / 100) : 0.5;
-    const cbseRatio = cbseRatioEl ? (parseInt(cbseRatioEl.value) / 100) : 0.5;
+    const difficulty = document.getElementById('difficulty').value;
+    const numericalRatio = parseInt(document.getElementById('numericalRatio').value) / 100;
+    const cbseRatio = parseInt(document.getElementById('cbseRatio').value) / 100;
     const aiRatio = 1 - cbseRatio;
     
     // Calculate questions per chapter to ensure even distribution
@@ -310,35 +281,6 @@ function generateQuestions(type, count, chapters) {
         const questionId = q.question + q.answer;
         usedQuestions.add(questionId);
     });
-    
-    // Final validation: ensure no placeholder text in MCQ options
-    if (type === 'mcq') {
-        questions = questions.map(q => {
-            if (q.options && Array.isArray(q.options)) {
-                const hasPlaceholder = q.options.some(opt => 
-                    typeof opt === 'string' && (
-                        opt.toLowerCase().includes('correct answer') ||
-                        opt.toLowerCase().includes('incorrect option') ||
-                        opt.match(/option\s+\d/i)
-                    )
-                );
-                
-                if (hasPlaceholder) {
-                    console.warn('Found placeholder MCQ options, replacing with valid ones');
-                    // Generate context-aware options based on the question
-                    const topic = q.question.substring(0, 30) + '...'; // Use part of question as topic
-                    q.options = [
-                        `The correct answer`,
-                        `A common misconception`,
-                        `A partially correct response`,
-                        `An incorrect answer`
-                    ];
-                    q.answer = q.options[0];
-                }
-            }
-            return q;
-        });
-    }
     
     // Shuffle final questions while maintaining the exact count
     return shuffleArray(questions).slice(0, count);
@@ -699,314 +641,13 @@ function generateAIMCQ(topic, subject, isNumerical) {
         templates = isNumerical ? chemistryNumericalMCQ : chemistryTheoreticalMCQ;
     } else if (subject === 'Mathematics') {
         templates = mathsNumericalMCQ;
-    } else if (subject === 'Biology') {
-        const biologyMCQ = [
-            {
-                template: `Which is the powerhouse of the cell?`,
-                options: ["Mitochondria", "Nucleus", "Ribosome", "Golgi body"],
-                answer: "Mitochondria"
-            },
-            {
-                template: `The process of photosynthesis occurs in:`,
-                options: ["Chloroplast", "Mitochondria", "Nucleus", "Cytoplasm"],
-                answer: "Chloroplast"
-            },
-            {
-                template: `Which blood group is universal donor?`,
-                options: ["O-", "AB+", "A+", "B-"],
-                answer: "O-"
-            },
-            {
-                template: `The functional unit of kidney is:`,
-                options: ["Nephron", "Neuron", "Alveoli", "Hepatocyte"],
-                answer: "Nephron"
-            }
-        ];
-        templates = biologyMCQ;
-    } else if (subject === 'English' || subject === 'English Language & Literature') {
-        const englishMCQ = [
-            {
-                template: `Which of the following is a noun?`,
-                options: ["Book", "Running", "Beautiful", "Quickly"],
-                answer: "Book",
-                concept: "parts-of-speech"
-            },
-            {
-                template: `Choose the correct form of the verb: She ___ to school every day.`,
-                options: ["goes", "go", "going", "gone"],
-                answer: "goes",
-                concept: "verb-forms"
-            },
-            {
-                template: `Which sentence is grammatically correct?`,
-                options: ["She and I went to the market", "Me and her went to the market", "She and me went to the market", "Her and I went to the market"],
-                answer: "She and I went to the market",
-                concept: "pronouns"
-            },
-            {
-                template: `Identify the figure of speech in: "The stars danced in the sky"`,
-                options: ["Personification", "Metaphor", "Simile", "Alliteration"],
-                answer: "Personification",
-                concept: "figures-of-speech"
-            },
-            {
-                template: `The synonym of 'happy' is:`,
-                options: ["Joyful", "Sad", "Angry", "Tired"],
-                answer: "Joyful",
-                concept: "vocabulary"
-            },
-            {
-                template: `Which punctuation mark is used at the end of a question?`,
-                options: ["Question mark (?)", "Full stop (.)", "Comma (,)", "Exclamation mark (!)"],
-                answer: "Question mark (?)",
-                concept: "punctuation"
-            },
-            {
-                template: `The opposite of 'ancient' is:`,
-                options: ["Modern", "Old", "Historic", "Past"],
-                answer: "Modern",
-                concept: "antonyms"
-            },
-            {
-                template: `Choose the correct article: ___ apple a day keeps the doctor away.`,
-                options: ["An", "A", "The", "No article"],
-                answer: "An",
-                concept: "articles"
-            }
-        ];
-        
-        // Add topic-specific questions if topic contains specific keywords
-        if (topic.toLowerCase().includes('grammar')) {
-            englishMCQ.push({
-                template: `Which sentence uses the past perfect tense?`,
-                options: ["I had finished my work", "I finished my work", "I am finishing my work", "I will finish my work"],
-                answer: "I had finished my work",
-                concept: "tenses"
-            });
-        }
-        if (topic.toLowerCase().includes('writing')) {
-            englishMCQ.push({
-                template: `The main purpose of a formal letter is to:`,
-                options: ["Communicate professionally", "Tell stories", "Express emotions", "Share jokes"],
-                answer: "Communicate professionally",
-                concept: "letter-writing"
-            });
-        }
-        // Add more comprehensive English MCQ questions
-        englishMCQ.push(
-            {
-                template: `Which of these is an adverb?`,
-                options: ["Quickly", "Quick", "Quickness", "Quicker"],
-                answer: "Quickly",
-                concept: "parts-of-speech-adverb"
-            },
-            {
-                template: `The correct plural of 'leaf' is:`,
-                options: ["Leaves", "Leafs", "Leafes", "Leaf"],
-                answer: "Leaves",
-                concept: "plural-irregular"
-            },
-            {
-                template: `Which word is spelled correctly?`,
-                options: ["Receive", "Recieve", "Receve", "Receeve"],
-                answer: "Receive",
-                concept: "spelling-rules"
-            },
-            {
-                template: `A sentence must have:`,
-                options: ["A subject and predicate", "Only a subject", "Only a verb", "Only an object"],
-                answer: "A subject and predicate",
-                concept: "sentence-structure"
-            },
-            {
-                template: `Which is a collective noun?`,
-                options: ["Team", "Player", "Game", "Score"],
-                answer: "Team",
-                concept: "collective-nouns"
-            },
-            {
-                template: `The past participle of 'write' is:`,
-                options: ["Written", "Wrote", "Writing", "Writes"],
-                answer: "Written",
-                concept: "verb-forms-participle"
-            },
-            {
-                template: `Which prefix means 'not'?`,
-                options: ["Un-", "Re-", "Pre-", "Post-"],
-                answer: "Un-",
-                concept: "prefixes"
-            },
-            {
-                template: `An example of alliteration is:`,
-                options: ["Peter Piper picked", "The cat sat", "Birds fly high", "Sun shines bright"],
-                answer: "Peter Piper picked",
-                concept: "literary-devices-alliteration"
-            },
-            {
-                template: `Which is a homophone of 'there'?`,
-                options: ["Their", "They're", "Both a and b", "None"],
-                answer: "Both a and b",
-                concept: "homophones"
-            },
-            {
-                template: `The main idea of a paragraph is usually found in:`,
-                options: ["Topic sentence", "Last sentence", "Middle sentence", "Title"],
-                answer: "Topic sentence",
-                concept: "paragraph-structure"
-            }
-        );
-        templates = englishMCQ;
-    } else if (subject === 'Social Science' || subject === 'Social Studies') {
-        const socialMCQ = [
-            {
-                template: `The capital of India is:`,
-                options: ["New Delhi", "Mumbai", "Kolkata", "Chennai"],
-                answer: "New Delhi"
-            },
-            {
-                template: `Who is known as the Father of the Nation in India?`,
-                options: ["Mahatma Gandhi", "Jawaharlal Nehru", "Sardar Patel", "Subhas Chandra Bose"],
-                answer: "Mahatma Gandhi"
-            },
-            {
-                template: `The longest river in India is:`,
-                options: ["Ganga", "Brahmaputra", "Godavari", "Narmada"],
-                answer: "Ganga"
-            },
-            {
-                template: `Which is the largest state in India by area?`,
-                options: ["Rajasthan", "Maharashtra", "Uttar Pradesh", "Madhya Pradesh"],
-                answer: "Rajasthan"
-            }
-        ];
-        templates = socialMCQ;
-    } else if (subject === 'Hindi') {
-        const hindiMCQ = [
-            {
-                template: `'पुस्तक' का बहुवचन क्या है?`,
-                options: ["पुस्तकें", "पुस्तकों", "पुस्तक", "पुस्तकीय"],
-                answer: "पुस्तकें"
-            },
-            {
-                template: `निम्नलिखित में से संज्ञा शब्द कौन सा है?`,
-                options: ["लड़का", "दौड़ना", "सुंदर", "धीरे"],
-                answer: "लड़का"
-            },
-            {
-                template: `'राम ने रावण को मारा' - इस वाक्य में कर्ता कौन है?`,
-                options: ["राम", "रावण", "मारा", "ने"],
-                answer: "राम"
-            }
-        ];
-        templates = hindiMCQ;
-    } else if (subject === 'Computer Science' || subject === 'Computer Applications') {
-        const computerMCQ = [
-            {
-                template: `Which of the following is an input device?`,
-                options: ["Keyboard", "Monitor", "Printer", "Speaker"],
-                answer: "Keyboard"
-            },
-            {
-                template: `The brain of computer is:`,
-                options: ["CPU", "Monitor", "Keyboard", "Mouse"],
-                answer: "CPU"
-            },
-            {
-                template: `1 KB equals:`,
-                options: ["1024 bytes", "1000 bytes", "1024 bits", "1000 bits"],
-                answer: "1024 bytes"
-            }
-        ];
-        templates = computerMCQ;
-    } else if (subject === 'EVS' || subject === 'Environmental Studies') {
-        const evsMCQ = [
-            {
-                template: `Which of the following is a renewable resource?`,
-                options: ["Solar energy", "Coal", "Petroleum", "Natural gas"],
-                answer: "Solar energy"
-            },
-            {
-                template: `The main gas responsible for global warming is:`,
-                options: ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
-                answer: "Carbon dioxide"
-            },
-            {
-                template: `Which day is celebrated as World Environment Day?`,
-                options: ["June 5", "April 22", "March 22", "December 10"],
-                answer: "June 5"
-            }
-        ];
-        templates = evsMCQ;
     } else {
-        // More meaningful generic templates for any other subject
-        templates = [
-            {
-                template: `Which of the following is a key concept in ${topic}?`,
-                options: [
-                    `Understanding the fundamentals of ${topic}`,
-                    `Ignoring basic principles of ${topic}`,
-                    `Avoiding ${topic} altogether`,
-                    `Misunderstanding ${topic} concepts`
-                ],
-                answer: `Understanding the fundamentals of ${topic}`,
-                concept: "generic-key-concept"
-            },
-            {
-                template: `The study of ${topic} is important because:`,
-                options: [
-                    `It helps develop critical thinking skills`,
-                    `It has no practical value`,
-                    `It is only for academic purposes`,
-                    `It is not relevant to students`
-                ],
-                answer: `It helps develop critical thinking skills`,
-                concept: "generic-importance"
-            },
-            {
-                template: `Which approach is best for learning ${topic}?`,
-                options: [
-                    `Regular practice and conceptual understanding`,
-                    `Memorization without comprehension`,
-                    `Occasional study without practice`,
-                    `Avoiding the subject entirely`
-                ],
-                answer: `Regular practice and conceptual understanding`,
-                concept: "generic-learning-approach"
-            },
-            {
-                template: `${topic} can be applied in:`,
-                options: [
-                    `Real-world problem solving`,
-                    `Theoretical discussions only`,
-                    `No practical situations`,
-                    `Unrelated fields only`
-                ],
-                answer: `Real-world problem solving`,
-                concept: "generic-application"
-            },
-            {
-                template: `Students who excel in ${topic} typically:`,
-                options: [
-                    `Practice regularly and seek understanding`,
-                    `Only memorize without understanding`,
-                    `Study only before exams`,
-                    `Avoid challenging problems`
-                ],
-                answer: `Practice regularly and seek understanding`,
-                concept: "generic-excellence"
-            },
-            {
-                template: `The foundation of ${topic} includes:`,
-                options: [
-                    `Basic principles and core concepts`,
-                    `Advanced topics only`,
-                    `Unrelated information`,
-                    `No structured learning`
-                ],
-                answer: `Basic principles and core concepts`,
-                concept: "generic-foundation"
-            }
-        ];
+        // Default templates for other subjects
+        templates = [{
+            template: `In context of ${topic}, which is correct?`,
+            options: ["Correct answer", "Incorrect option 1", "Incorrect option 2", "Incorrect option 3"],
+            answer: "Correct answer"
+        }];
     }
     
     // Filter out already used templates and concepts
@@ -1038,45 +679,11 @@ function generateAIMCQ(topic, subject, isNumerical) {
     
     let question = template.template.replace(/\${topic}/g, topic);
     
-    // Validate MCQ before returning
-    const mcqResult = {
+    return {
         question: question,
         options: template.options,
         answer: template.answer
     };
-    
-    // Safety check: ensure options are valid
-    if (!mcqResult.options || !Array.isArray(mcqResult.options) || mcqResult.options.length < 4) {
-        console.warn('Invalid MCQ options detected, using fallback');
-        mcqResult.options = [
-            `Understanding ${topic} concepts`,
-            `Applying ${topic} principles`,
-            `Analyzing ${topic} problems`,
-            `Evaluating ${topic} solutions`
-        ];
-        mcqResult.answer = mcqResult.options[0];
-    }
-    
-    // Ensure no placeholder text in options
-    const hasPlaceholder = mcqResult.options.some(opt => 
-        opt.toLowerCase().includes('correct answer') || 
-        opt.toLowerCase().includes('incorrect option') ||
-        opt.toLowerCase().includes('option 1') ||
-        opt.toLowerCase().includes('option 2')
-    );
-    
-    if (hasPlaceholder) {
-        console.warn('Placeholder options detected, regenerating');
-        mcqResult.options = [
-            `Core concept of ${topic}`,
-            `Related aspect of ${topic}`,
-            `Application of ${topic}`,
-            `Extension of ${topic}`
-        ];
-        mcqResult.answer = mcqResult.options[0];
-    }
-    
-    return mcqResult;
 }
 
 function generateAIShort(topic, subject, isNumerical) {
@@ -1475,15 +1082,10 @@ function generateGenericQuestionOld(type, chapter) {
     const topic = chapter.replace(/Chapter \d+: /, '').replace(/Unit \d+/, 'concepts');
     
     if (type === 'mcq') {
-        // Replace [TOPIC] in both question and options
-        const processedOptions = template.options.map(opt => 
-            opt.replace ? opt.replace(/\[TOPIC\]/g, topic) : opt
-        );
-        
         return {
-            question: template.template.replace(/\[TOPIC\]/g, topic),
-            options: processedOptions,
-            answer: processedOptions[0]
+            question: template.template.replace('[TOPIC]', topic),
+            options: template.options,
+            answer: template.options[0]
         };
     } else {
         return {
@@ -1588,16 +1190,8 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionA.className = 'section';
         sectionA.innerHTML = '<h3>Section A - Multiple Choice Questions</h3>';
         
-        let mcqQuestions = [];
-        try {
-            mcqQuestions = generateQuestions('mcq', mcqCount, selectedChapters);
-        } catch (e) {
-            console.error('Error generating MCQ questions:', e);
-            alert('Error generating MCQ questions. Please try again.');
-            return;
-        }
-        const mcqMarksEl = document.getElementById('mcqMarks');
-        const mcqMarks = mcqMarksEl ? parseInt(mcqMarksEl.value) : 1;
+        const mcqQuestions = generateQuestions('mcq', mcqCount, selectedChapters);
+        const mcqMarks = parseInt(document.getElementById('mcqMarks').value);
         
         mcqQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
@@ -1638,8 +1232,7 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionB.innerHTML = '<h3>Section B - Short Answer Questions</h3>';
         
         const shortQuestions = generateQuestions('short', shortCount, selectedChapters);
-        const shortMarksEl = document.getElementById('shortMarks');
-        const shortMarks = shortMarksEl ? parseInt(shortMarksEl.value) : 2;
+        const shortMarks = parseInt(document.getElementById('shortMarks').value);
         
         shortQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
@@ -1669,8 +1262,7 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionC.innerHTML = '<h3>Section C - Long Answer Questions</h3>';
         
         const longQuestions = generateQuestions('long', longCount, selectedChapters);
-        const longMarksEl = document.getElementById('longMarks');
-        const longMarks = longMarksEl ? parseInt(longMarksEl.value) : 5;
+        const longMarks = parseInt(document.getElementById('longMarks').value);
         
         longQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
