@@ -1588,8 +1588,16 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionA.className = 'section';
         sectionA.innerHTML = '<h3>Section A - Multiple Choice Questions</h3>';
         
-        const mcqQuestions = generateQuestions('mcq', mcqCount, selectedChapters);
-        const mcqMarks = parseInt(document.getElementById('mcqMarks').value);
+        let mcqQuestions = [];
+        try {
+            mcqQuestions = generateQuestions('mcq', mcqCount, selectedChapters);
+        } catch (e) {
+            console.error('Error generating MCQ questions:', e);
+            alert('Error generating MCQ questions. Please try again.');
+            return;
+        }
+        const mcqMarksEl = document.getElementById('mcqMarks');
+        const mcqMarks = mcqMarksEl ? parseInt(mcqMarksEl.value) : 1;
         
         mcqQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
@@ -1630,7 +1638,8 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionB.innerHTML = '<h3>Section B - Short Answer Questions</h3>';
         
         const shortQuestions = generateQuestions('short', shortCount, selectedChapters);
-        const shortMarks = parseInt(document.getElementById('shortMarks').value);
+        const shortMarksEl = document.getElementById('shortMarks');
+        const shortMarks = shortMarksEl ? parseInt(shortMarksEl.value) : 2;
         
         shortQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
@@ -1660,7 +1669,8 @@ function generateTraditionalFormatPaper(paperContent, mcqCount, shortCount, long
         sectionC.innerHTML = '<h3>Section C - Long Answer Questions</h3>';
         
         const longQuestions = generateQuestions('long', longCount, selectedChapters);
-        const longMarks = parseInt(document.getElementById('longMarks').value);
+        const longMarksEl = document.getElementById('longMarks');
+        const longMarks = longMarksEl ? parseInt(longMarksEl.value) : 5;
         
         longQuestions.forEach((q, index) => {
             const questionDiv = document.createElement('div');
