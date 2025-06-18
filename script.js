@@ -811,35 +811,84 @@ function generateAIShort(topic, subject, isNumerical) {
 }
 
 function generateSubjectSpecificAnswer(question, subject, topic, isNumerical) {
-    // Physics answers
-    if (subject === 'Physics') {
-        const physicsAnswers = {
-            "A car travels 120 km in 2 hours. Calculate its average speed.": "Speed = Distance/Time = 120/2 = 60 km/h",
-            "Find the kinetic energy of a 5 kg object moving at 10 m/s.": "KE = ½mv² = ½ × 5 × 10² = 250 J",
-            "Calculate the resistance if a current of 2A flows through a conductor with potential difference of 10V.": "R = V/I = 10/2 = 5 Ω",
-            "A force of 20N acts on a mass of 4 kg. Find the acceleration.": "F = ma, so a = F/m = 20/4 = 5 m/s²",
-            "Calculate the power consumed by a 100Ω resistor carrying 2A current.": "P = I²R = 2² × 100 = 400 W",
-            "State Newton's laws of motion.": "1) Law of inertia 2) F = ma 3) Action-reaction pairs"
-        };
-        return physicsAnswers[question] || `Solution involves applying ${topic} principles with appropriate formulas and calculations.`;
+    // Generate more specific answers based on question patterns
+    
+    // For numerical questions
+    if (isNumerical) {
+        if (question.includes("Calculate")) {
+            if (subject === 'Physics') {
+                return `Step 1: Identify given values\nStep 2: Apply relevant formula from ${topic}\nStep 3: Substitute values and calculate\nStep 4: Final answer with appropriate units`;
+            } else if (subject === 'Chemistry') {
+                return `Step 1: Write the chemical equation/formula\nStep 2: Apply ${topic} principles\nStep 3: Calculate using given data\nStep 4: Express answer with correct units and significant figures`;
+            } else if (subject === 'Mathematics') {
+                return `Step 1: Identify the type of problem\nStep 2: Apply ${topic} theorem/formula\nStep 3: Solve step by step\nStep 4: Verify and write final answer`;
+            }
+            return `Detailed calculation using ${topic} formulas, showing all steps and final numerical answer with units.`;
+        }
+        
+        if (question.includes("Find") || question.includes("Determine")) {
+            return `Solution:\n1. Given data analysis\n2. Formula selection from ${topic}\n3. Systematic calculation\n4. Result: [Numerical value with units]`;
+        }
+        
+        if (question.includes("Solve")) {
+            return `Solution process:\n1. Set up the equation\n2. Apply ${topic} method\n3. Solve algebraically\n4. Check and state final answer`;
+        }
     }
     
-    // Chemistry answers
-    if (subject === 'Chemistry') {
-        const chemistryAnswers = {
-            "Calculate the molecular mass of H₂SO₄.": "H₂SO₄ = 2(1) + 32 + 4(16) = 98 g/mol",
-            "Find the number of moles in 44g of CO₂.": "Moles = mass/molar mass = 44/44 = 1 mole",
-            "Calculate the pH of 0.01M HCl solution.": "pH = -log[H⁺] = -log(0.01) = 2",
-            "Find the oxidation number of Mn in KMnO₄.": "K(+1) + Mn(x) + 4O(-2) = 0, so x = +7",
-            "Calculate the percentage composition of oxygen in water.": "O% = (16/18) × 100 = 88.89%"
-        };
-        return chemistryAnswers[question] || `Answer involves ${topic} concepts and chemical calculations.`;
+    // For theoretical questions
+    if (!isNumerical) {
+        if (question.includes("Define")) {
+            return `Definition: ${topic} is [comprehensive definition with key characteristics]\n\nExamples:\n1. [First example]\n2. [Second example]\n\nImportance: [Why this concept matters in ${subject}]`;
+        }
+        
+        if (question.includes("Explain")) {
+            return `Explanation of ${topic}:\n\n1. Basic Concept: [Core understanding]\n2. Working Principle: [How it works]\n3. Key Features: [Important characteristics]\n4. Applications: [Real-world uses]\n5. Significance in ${subject}: [Why it's important]`;
+        }
+        
+        if (question.includes("importance") || question.includes("significance")) {
+            return `Importance of ${topic} in ${subject}:\n\n1. Theoretical significance: [Academic importance]\n2. Practical applications: [Real-world uses]\n3. Connection to other concepts: [Related topics]\n4. Future implications: [Modern relevance]`;
+        }
+        
+        if (question.includes("Describe")) {
+            return `Description of ${topic}:\n\n• Main characteristics: [Key features]\n• Types/Categories: [Different varieties]\n• Examples: [Specific instances]\n• Related concepts: [Connected ideas]\n• Practical implications: [Real-world impact]`;
+        }
+        
+        if (question.includes("List")) {
+            return `Applications/Characteristics of ${topic}:\n\n1. [First point with brief explanation]\n2. [Second point with brief explanation]\n3. [Third point with brief explanation]\n4. [Fourth point with brief explanation]\n5. [Fifth point with brief explanation]`;
+        }
     }
     
-    // Default answer
-    return isNumerical ? 
-        `Step-by-step calculation using ${topic} formulas and principles.` :
-        `Comprehensive explanation of ${topic} covering key concepts and applications in ${subject}.`;
+    // Subject-specific default answers
+    const subjectSpecificAnswers = {
+        Physics: isNumerical ? 
+            `Numerical Solution:\nGiven: [Extract from question]\nFormula: [Relevant ${topic} equation]\nCalculation: [Step-by-step working]\nAnswer: [Final result with units]` :
+            `Theoretical Answer:\n${topic} concept explanation with diagrams where applicable, real-world examples, and connection to fundamental physics principles.`,
+            
+        Chemistry: isNumerical ?
+            `Chemical Calculation:\nGiven data: [From question]\nChemical principle: [${topic} concept]\nCalculation steps: [Detailed working]\nFinal answer: [With appropriate units]` :
+            `Theoretical Explanation:\n${topic} in chemistry involves [concept explanation], including molecular behavior, chemical properties, and practical applications.`,
+            
+        Mathematics: isNumerical ?
+            `Mathematical Solution:\nGiven: [Problem statement]\nMethod: [${topic} approach]\nStep-by-step solution: [Detailed working]\nAnswer: [Final result]` :
+            `Mathematical Concept:\n${topic} theorem/principle with proof outline, geometric interpretation where applicable, and problem-solving applications.`,
+            
+        Biology: isNumerical ?
+            `Biological Calculation:\nGiven information: [Data extraction]\nBiological principle: [${topic} concept]\nCalculation: [Step-by-step]\nResult: [With biological significance]` :
+            `Biological Explanation:\n${topic} process/concept including structure-function relationships, evolutionary significance, and ecological importance.`,
+            
+        English: `Comprehensive Answer:\n${topic} analysis including literary devices, contextual understanding, character development, thematic significance, and critical appreciation.`,
+        
+        Hindi: `विस्तृत उत्तर:\n${topic} की व्याख्या, उदाहरण सहित, व्याकरण के नियम, और व्यावहारिक प्रयोग।`,
+        
+        "Social Science": `Detailed Answer:\n${topic} explanation covering historical context, geographical factors, economic implications, and social impact with relevant examples.`,
+        
+        EVS: `Environmental Answer:\n${topic} concept explaining ecological relationships, environmental impact, conservation measures, and sustainable practices.`
+    };
+    
+    return subjectSpecificAnswers[subject] || 
+           (isNumerical ? 
+            `Numerical solution for ${topic} showing complete working and final answer.` :
+            `Comprehensive explanation of ${topic} with examples and applications in ${subject}.`);
 }
 
 function generateAILong(topic, subject, isNumerical) {
@@ -920,24 +969,69 @@ function generateAILong(topic, subject, isNumerical) {
     
     question = question.replace(/\${topic}/g, topic);
     
-    // Generate detailed answers based on subject
-    let answer = "";
-    if (subject === 'Physics' && isNumerical) {
-        answer = "Complete solution with given data, formula used, substitution, calculation, and final answer with proper units.";
-    } else if (subject === 'Chemistry' && isNumerical) {
-        answer = "Step-by-step solution showing chemical equations, calculations, and final result with proper significant figures.";
-    } else if (subject === 'Mathematics' && isNumerical) {
-        answer = "Detailed mathematical solution with theorems applied, integration/differentiation steps, and graphical representation if needed.";
-    } else if (isNumerical) {
-        answer = "Complete numerical solution with formula, substitution, and final answer.";
-    } else {
-        answer = `Comprehensive explanation covering definition, principles, mechanisms, examples, applications, and significance of ${topic} in ${subject}.`;
-    }
+    // Generate detailed answers based on subject and question type
+    const answer = generateDetailedAnswer(question, subject, topic, isNumerical);
     
     return {
         question: question,
         answer: answer
     };
+}
+
+function generateDetailedAnswer(question, subject, topic, isNumerical) {
+    // Generate comprehensive answers for long questions
+    
+    if (subject === 'Physics') {
+        if (question.includes("projectile")) {
+            return `Solution:\nGiven: Initial velocity = 20 m/s, angle = 45°, g = 10 m/s²\n\nFor maximum height:\nH = (u²sin²θ)/2g = (20² × sin²45°)/2×10 = (400 × 0.5)/20 = 10 m\n\nFor range:\nR = (u²sin2θ)/g = (400 × sin90°)/10 = 400/10 = 40 m\n\nTherefore, maximum height = 10 m and range = 40 m`;
+        }
+        if (question.includes("transformer")) {
+            return `Solution:\nGiven: Primary turns (Np) = 1000, Secondary turns (Ns) = 100, Primary voltage (Vp) = 220V\n\nUsing transformer equation: Vp/Vs = Np/Ns\n220/Vs = 1000/100\nVs = 220 × 100/1000 = 22V\n\nSince Ns < Np, this is a step-down transformer.\nOutput voltage = 22V`;
+        }
+        if (question.includes("Derive")) {
+            return `Derivation of ${topic}:\n\n1. Starting principle: [Basic law/equation]\n2. Mathematical development: [Step-by-step derivation]\n3. Final expression: [Resulting formula]\n4. Physical significance: [What it means]\n5. Applications: [Where it's used]\n6. Limitations: [When it applies]`;
+        }
+    }
+    
+    if (subject === 'Chemistry') {
+        if (question.includes("pH") && question.includes("mixing")) {
+            return `Solution:\nGiven: 50 mL of 0.1M HCl mixed with 50 mL of 0.2M NaOH\n\nMoles of H⁺ = 0.1 × 0.050 = 0.005 mol\nMoles of OH⁻ = 0.2 × 0.050 = 0.010 mol\n\nExcess OH⁻ = 0.010 - 0.005 = 0.005 mol\nTotal volume = 100 mL = 0.1 L\n\n[OH⁻] = 0.005/0.1 = 0.05 M\npOH = -log(0.05) = 1.3\npH = 14 - 1.3 = 12.7`;
+        }
+        if (question.includes("empirical formula")) {
+            return `Solution:\nGiven: 40% C, 6.67% H, 53.33% O, Molecular mass = 180 g/mol\n\nStep 1: Convert to moles (assume 100g sample)\nC: 40/12 = 3.33 mol\nH: 6.67/1 = 6.67 mol\nO: 53.33/16 = 3.33 mol\n\nStep 2: Find simplest ratio\nC : H : O = 3.33 : 6.67 : 3.33 = 1 : 2 : 1\n\nEmpirical formula: CH₂O\nEmpirical mass = 12 + 2 + 16 = 30\n\nMolecular formula = (CH₂O)n where n = 180/30 = 6\nMolecular formula: C₆H₁₂O₆`;
+        }
+    }
+    
+    if (subject === 'Mathematics') {
+        if (question.includes("area bounded")) {
+            return `Solution:\nFind area between y = x² and y = 2x\n\nStep 1: Find intersection points\nx² = 2x\nx² - 2x = 0\nx(x - 2) = 0\nx = 0 or x = 2\n\nStep 2: Set up integral\nArea = ∫₀² (2x - x²) dx\n\nStep 3: Integrate\n= [x² - x³/3]₀²\n= 4 - 8/3 - 0\n= 4 - 8/3 = 4/3 square units`;
+        }
+        if (question.includes("differential equation")) {
+            return `Solution:\nSolve: dy/dx + 2y = e^x\n\nStep 1: Find integrating factor\nI.F. = e^∫2dx = e^2x\n\nStep 2: Multiply equation by I.F.\ne^2x(dy/dx) + 2e^2x·y = e^3x\n\nStep 3: Integrate\nd/dx(y·e^2x) = e^3x\ny·e^2x = ∫e^3x dx = e^3x/3 + C\n\nStep 4: General solution\ny = e^x/3 + Ce^(-2x)`;
+        }
+    }
+    
+    if (subject === 'Biology') {
+        if (question.includes("dihybrid cross")) {
+            return `Solution:\nDihybrid cross: TtRr × TtRr\n\nGametes: TR, Tr, tR, tr (from each parent)\n\nPunnett Square (4×4):\nF₂ Phenotypic ratio:\n- Tall, Round: 9\n- Tall, wrinkled: 3\n- short, Round: 3\n- short, wrinkled: 1\nRatio = 9:3:3:1\n\nGenotypic ratio:\nTTRR:1, TTRr:2, TtRR:2, TtRr:4, TTrr:1, Ttrr:2, ttRR:1, ttRr:2, ttrr:1`;
+        }
+        if (question.includes("glycolysis")) {
+            return `ATP gain in Glycolysis:\n\nEnergy Investment Phase:\n- Glucose → G6P: -1 ATP\n- F6P → F1,6BP: -1 ATP\nTotal investment: -2 ATP\n\nEnergy Payoff Phase:\n- 2(1,3-BPG → 3-PG): +2 ATP\n- 2(PEP → Pyruvate): +2 ATP\nTotal production: +4 ATP\n\nNet gain = 4 - 2 = 2 ATP\nAlso produces: 2 NADH, 2 Pyruvate`;
+        }
+    }
+    
+    // For other theoretical questions
+    if (!isNumerical) {
+        if (question.includes("mechanism")) {
+            return `Mechanism of ${topic}:\n\n1. Initial Step: [Starting point]\n2. Intermediate Steps: [Process details]\n3. Final Step: [End result]\n4. Regulatory Factors: [What controls it]\n5. Examples: [Specific cases]\n6. Importance: [Why it matters in ${subject}]`;
+        }
+        if (question.includes("factors affecting")) {
+            return `Factors affecting ${topic}:\n\n1. Temperature: [How temperature affects]\n2. Pressure/Concentration: [Effect of pressure/concentration]\n3. Catalysts: [Role of catalysts]\n4. Environmental conditions: [Other factors]\n5. Industrial applications: [Practical use]\n\nEach factor explained with examples and graphical representation where applicable.`;
+        }
+    }
+    
+    // Default comprehensive answer
+    return generateSubjectSpecificAnswer(question, subject, topic, isNumerical);
 }
 
 function generateGenericQuestion(type, chapter) {
