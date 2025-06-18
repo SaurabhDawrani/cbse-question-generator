@@ -14,19 +14,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateRatioDisplay(type) {
     if (type === 'numerical') {
-        let value = parseInt(document.getElementById('numericalRatio').value) || 0;
+        const numericalEl = document.getElementById('numericalRatio');
+        const theoreticalEl = document.getElementById('theoreticalRatio');
+        if (!numericalEl || !theoreticalEl) return;
+        
+        let value = parseInt(numericalEl.value) || 0;
         // Ensure value is between 0 and 100
         if (value > 100) value = 100;
         if (value < 0) value = 0;
-        document.getElementById('numericalRatio').value = value;
-        document.getElementById('theoreticalRatio').value = 100 - value;
+        numericalEl.value = value;
+        theoreticalEl.value = 100 - value;
     } else if (type === 'ai') {
-        let value = parseInt(document.getElementById('cbseRatio').value) || 0;
+        const cbseEl = document.getElementById('cbseRatio');
+        const aiEl = document.getElementById('aiRatio');
+        if (!cbseEl || !aiEl) return;
+        
+        let value = parseInt(cbseEl.value) || 0;
         // Ensure value is between 0 and 100
         if (value > 100) value = 100;
         if (value < 0) value = 0;
-        document.getElementById('cbseRatio').value = value;
-        document.getElementById('aiRatio').value = 100 - value;
+        cbseEl.value = value;
+        aiEl.value = 100 - value;
     }
 }
 
@@ -168,15 +176,30 @@ function updateSelectedChapters() {
 }
 
 function calculateTotalMarks() {
-    const mcqCount = parseInt(document.getElementById('mcqCount').value) || 0;
-    const mcqMarks = parseInt(document.getElementById('mcqMarks').value) || 0;
-    const shortCount = parseInt(document.getElementById('shortCount').value) || 0;
-    const shortMarks = parseInt(document.getElementById('shortMarks').value) || 0;
-    const longCount = parseInt(document.getElementById('longCount').value) || 0;
-    const longMarks = parseInt(document.getElementById('longMarks').value) || 0;
+    // Add null checks to prevent errors
+    const mcqCountEl = document.getElementById('mcqCount');
+    const mcqMarksEl = document.getElementById('mcqMarks');
+    const shortCountEl = document.getElementById('shortCount');
+    const shortMarksEl = document.getElementById('shortMarks');
+    const longCountEl = document.getElementById('longCount');
+    const longMarksEl = document.getElementById('longMarks');
+    const totalMarksEl = document.getElementById('calculatedTotalMarks');
+    
+    // Check if all elements exist
+    if (!mcqCountEl || !mcqMarksEl || !shortCountEl || !shortMarksEl || !longCountEl || !longMarksEl || !totalMarksEl) {
+        console.warn('Some form elements not found, skipping total marks calculation');
+        return;
+    }
+    
+    const mcqCount = parseInt(mcqCountEl.value) || 0;
+    const mcqMarks = parseInt(mcqMarksEl.value) || 0;
+    const shortCount = parseInt(shortCountEl.value) || 0;
+    const shortMarks = parseInt(shortMarksEl.value) || 0;
+    const longCount = parseInt(longCountEl.value) || 0;
+    const longMarks = parseInt(longMarksEl.value) || 0;
     
     const totalMarks = (mcqCount * mcqMarks) + (shortCount * shortMarks) + (longCount * longMarks);
-    document.getElementById('calculatedTotalMarks').textContent = totalMarks;
+    totalMarksEl.textContent = totalMarks;
 }
 
 function shuffleArray(array) {
@@ -190,9 +213,15 @@ function shuffleArray(array) {
 
 function generateQuestions(type, count, chapters) {
     const questions = [];
-    const difficulty = document.getElementById('difficulty').value;
-    const numericalRatio = parseInt(document.getElementById('numericalRatio').value) / 100;
-    const cbseRatio = parseInt(document.getElementById('cbseRatio').value) / 100;
+    
+    // Add null checks for form elements
+    const difficultyEl = document.getElementById('difficulty');
+    const numericalRatioEl = document.getElementById('numericalRatio');
+    const cbseRatioEl = document.getElementById('cbseRatio');
+    
+    const difficulty = difficultyEl ? difficultyEl.value : 'medium';
+    const numericalRatio = numericalRatioEl ? (parseInt(numericalRatioEl.value) / 100) : 0.5;
+    const cbseRatio = cbseRatioEl ? (parseInt(cbseRatioEl.value) / 100) : 0.5;
     const aiRatio = 1 - cbseRatio;
     
     // Calculate questions per chapter to ensure even distribution
@@ -297,12 +326,12 @@ function generateQuestions(type, count, chapters) {
                 if (hasPlaceholder) {
                     console.warn('Found placeholder MCQ options, replacing with valid ones');
                     // Generate context-aware options based on the question
-                    const topic = chapter.replace(/Chapter \d+: /, '').replace(/Unit \d+/, 'concepts');
+                    const topic = q.question.substring(0, 30) + '...'; // Use part of question as topic
                     q.options = [
-                        `Correct understanding of ${topic}`,
-                        `Partial understanding of ${topic}`,
-                        `Common misconception about ${topic}`,
-                        `Unrelated to ${topic}`
+                        `The correct answer`,
+                        `A common misconception`,
+                        `A partially correct response`,
+                        `An incorrect answer`
                     ];
                     q.answer = q.options[0];
                 }
